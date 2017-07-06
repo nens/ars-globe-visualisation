@@ -69,8 +69,8 @@ class App extends Component {
 
     planet.loadPlugin(autorotate(10));
 
-    if (document.location.href.indexOf('localhost') > 0) {
-      console.log("We're on localhost");
+    if (document.location.href.indexOf('localhost:3000') > 0) {
+      console.log("On localhost:3000, get world-110m.json from /");
       planet.loadPlugin(
         planetaryjs.plugins.earth({
           topojson: { file: "world-110m.json" },
@@ -81,7 +81,7 @@ class App extends Component {
       );
     }
     else {
-      console.log("We're not on localhost");
+      console.log("Not on localhost:3000, getting world-110m.json from /static_media/");
       planet.loadPlugin(
         planetaryjs.plugins.earth({
           topojson: { file: "/static_media/world-110m.json" },
