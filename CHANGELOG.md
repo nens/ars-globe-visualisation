@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/nens/ars-globe-visualisation/compare/v0.1.3...v0.2.0) (2017-07-06)
+
+
+### Features
+
+* **ARS:** Adds recent additions in list, adds button to login/add. ([f36bfab](https://github.com/nens/ars-globe-visualisation/commit/f36bfab))
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/nens/ars-globe-visualisation/compare/v0.1.2...v0.1.3) (2017-07-06)
 
