@@ -69,14 +69,28 @@ class App extends Component {
 
     planet.loadPlugin(autorotate(10));
 
-    planet.loadPlugin(
-      planetaryjs.plugins.earth({
-        topojson: { file: "world-110m.json" },
-        oceans: { fill: "#001320" },
-        land: { fill: "#06304e" },
-        borders: { stroke: "#001320" }
-      })
-    );
+
+    if (document.location.href.indexOf('localhost') > 0) {
+      planet.loadPlugin(
+        planetaryjs.plugins.earth({
+          topojson: { file: "world-110m.json" },
+          oceans: { fill: "#001320" },
+          land: { fill: "#06304e" },
+          borders: { stroke: "#001320" }
+        })
+      );
+    }
+    else {
+      planet.loadPlugin(
+        planetaryjs.plugins.earth({
+          topojson: { file: "/static_media/world-110m.json" },
+          oceans: { fill: "#001320" },
+          land: { fill: "#06304e" },
+          borders: { stroke: "#001320" }
+        })
+      );
+    }
+
 
     planet.projection.scale(175).translate([175, 175]).rotate([0, -10, 0]);
 
