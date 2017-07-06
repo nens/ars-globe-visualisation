@@ -176,9 +176,10 @@ class App extends Component {
 
     return (
       <div className={styles.App}>
-        <h1>Nelen & Schuurmans</h1>
-        <h2>In 80 dagen om de wereld</h2>
-
+        <h3>Reis om de wereld in 80 dagen</h3>
+        <a href="/booking/" className={styles.AddButton}>
+          Afstand loggen
+        </a>
         {data.length === 0 ? <MDSpinner /> : null}
 
         <canvas
@@ -195,10 +196,6 @@ class App extends Component {
               <h3>Totaal afgelegd: {Math.round(total)} km</h3>
               <h4>(Nog {Math.round(toGo)} kilometer te gaan)</h4>
             </div>}
-
-        <a href="/booking/" className={styles.AddButton}>
-          Afstand loggen
-        </a>
 
         <Scrollbars style={{ width: 600, height: 600 }}>
           {data.movements_latest.map((entry, i) => {
