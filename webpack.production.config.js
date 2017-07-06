@@ -1,7 +1,7 @@
 const path = require("path");
 var webpack = require("webpack");
 
-var libraryName = "Lizard";
+var libraryName = "ars-globe";
 
 const definePlugin = new webpack.DefinePlugin({
   'process.env': {
@@ -16,26 +16,15 @@ var config = {
   ],
   devtool: false,
   output: {
-    path: __dirname + "/lib",
+    path: __dirname + "/dist",
     filename: libraryName + ".js",
-    publicPath: "/scripts/",
+    // publicPath: "/scripts/",
     library: libraryName,
     libraryTarget: "umd",
     umdNamedDefine: true
   },
   resolve: {
     extensions: [".js", ".jsx"]
-  },
-  devServer: {
-    hot: true,
-    compress: false,
-    inline: false,
-    contentBase: path.join(__dirname, "dist"),
-    publicPath: "/",
-    headers: {
-      "Access-Control-Allow-Origin": "http://0.0.0.0:8080",
-      "Access-Control-Allow-Credentials": "true"
-    }
   },
   module: {
     loaders: [
@@ -60,10 +49,10 @@ var config = {
     ]
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
     // enable HMR globally
 
-    new webpack.NamedModulesPlugin(),
+    // new webpack.NamedModulesPlugin(),
     // prints more readable module names in the browser console on HMR updates
 
     new webpack.DefinePlugin({

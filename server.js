@@ -44,7 +44,7 @@ app.use("/media", (req, res) => {
 });
 
 app.use("/api", (req, res) => {
-  const url = "https://nxt.staging.lizard.net/api" + req.url;
+  const url = "http://localhost:5000/api" + req.url;
   const headers = {
     username: process.env.sso_user,
     password: process.env.sso_pass

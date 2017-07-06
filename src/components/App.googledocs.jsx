@@ -65,7 +65,16 @@ class App extends Component {
 
   drawPlanet() {
     const { data } = this.state;
-    const total = data.total_distance_m;
+    const total = data.reduce(
+      (prev, next) => prev + Number(next["Aantal kilometers vandaag"]),
+      0
+    );
+
+    // const total = 1000;
+    // const degreesLatitude = distanceToDegrees((total * 1000), 'meters');
+
+    // console.log("total meters", total * 1000);
+    // console.log("km2deg", degreesLatitude);
 
     planet.loadPlugin(autorotate(10));
 
@@ -111,20 +120,25 @@ class App extends Component {
           }
 
           // Divide arc into four so they don't wrap around the world the wrong way
-          var step = 40075 / 4;
-          var arcs = [[0, 0], [90, step], [180, 2 * step], [270, 3 * step]];
+          var step = 40075/4;
+          var arcs = [
+            [0, 0],
+            [90, step],
+            [180, 2*step],
+            [270, 3*step]
+          ];
 
           arcs.forEach((element, i) => {
             let degrees = element[0];
             let start = element[1];
 
             // Dist is between 0 and 1, part of this arc to draw
-            let dist = (total - start) / step;
+            let dist = (total-start)/step;
             if (dist <= 0) return;
             if (dist > 1) dist = 1;
 
             drawArc(degrees, degrees + dist * 90);
-          });
+          })
         });
       });
     });
@@ -135,25 +149,42 @@ class App extends Component {
   }
 
   initTableTop() {
-    fetch("/api").then(response => response.json()).then(data => {
-      this.setState(
-        {
-          data: data
-        },
-        () => {
-          this.drawPlanet();
-        }
-      );
+    fetch("/api")
+      .then(response => response.json())
+      .then(data => {
+        console.log('data', data);
+      });
+
+    const publicSpreadsheetUrl =
+      "https://docs.google.com/spreadsheets/d/1hNSjrLNcToTw8PU28uIJH-AlMpTONnOAPWHRWXNEpLQ/pubhtml";
+    Tabletop.init({
+      key: publicSpreadsheetUrl,
+      callback: (data, tabletop) => {
+        this.setState(
+          {
+            data: data.reverse()
+          },
+          () => {
+            this.drawPlanet();
+          }
+        );
+      },
+      simpleSheet: true
     });
   }
   render() {
     const { data } = this.state;
-    const total = data.total_distance_m;
-    const toGo = data.earth_circumference_m - total;
+    const total = data.reduce(
+      (prev, next) => prev + Number(next["Aantal kilometers vandaag"]),
+      0
+    );
+    const toGo = TOTAL_EARTH_DISTANCE_KM - total;
 
     return (
-      <div className={styles.App}>
-        {/* <h1>In 80 dagen om de wereld</h1> */}
+      <div
+        className={styles.App}
+      >
+        <h1>In 80 dagen om de wereld</h1>
 
         {data.length === 0 ? <MDSpinner /> : null}
 
@@ -167,10 +198,29 @@ class App extends Component {
 
         {data.length === 0
           ? null
-          : <div style={{ textAlign: "center" }}>
+          : <div>
               <h3>Totaal afgelegd: {Math.round(total)} km</h3>
-              <h4>(Nog {Math.round(toGo)} kilometer te gaan)</h4>
+              <h4>Nog {Math.round(toGo)} km te gaan</h4>
             </div>}
+
+        <div style={{ height: 600, overflowY: "scroll" }}>
+          {data.map((entry, i) => {
+            const name = entry["Email address"].split("@")[0];
+            const distanceInKm = entry["Aantal kilometers vandaag"];
+            const distanceInMeters = distanceInKm * 1000;
+            const since = moment(
+              entry["Timestamp"],
+              "DD/MM/YYYY HH:mm:ss"
+            ).locale("nl");
+            return (
+              <div key={i}>
+                <h1>{name}</h1>
+                <h2
+                >{`...legde ${since.fromNow()} ${distanceInKm} kilometer af...`}</h2>
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   }
