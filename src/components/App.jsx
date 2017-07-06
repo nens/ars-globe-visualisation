@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
+import { Scrollbars } from "react-custom-scrollbars";
 import styles from "./styles/App.css";
 import Ruler from "./svg/Ruler.svg";
 import moment from "moment";
@@ -48,7 +49,14 @@ class App extends Component {
     this.state = {
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
-      data: []
+      data: {
+        earth_circumference_m: 40075000,
+        edit_url: null,
+        movements_latest: [],
+        movements_user: [],
+        person: null,
+        total_distance_m: null
+      }
     };
     this.initTableTop = this.initTableTop.bind(this);
     this.drawPlanet = this.drawPlanet.bind(this);
@@ -65,11 +73,11 @@ class App extends Component {
 
   drawPlanet() {
     const { data } = this.state;
-    const total = data.total_distance_m;
+    const total = data.total_distance_m / 1000;
 
     planet.loadPlugin(autorotate(10));
 
-    if (document.location.href.indexOf('localhost:3000') > 0) {
+    if (document.location.href.indexOf("localhost:3000") > 0) {
       console.log("On localhost:3000, get world-110m.json from /");
       planet.loadPlugin(
         planetaryjs.plugins.earth({
@@ -79,9 +87,10 @@ class App extends Component {
           borders: { stroke: "#001320" }
         })
       );
-    }
-    else {
-      console.log("Not on localhost:3000, getting world-110m.json from /static_media/");
+    } else {
+      console.log(
+        "Not on localhost:3000, getting world-110m.json from /static_media/"
+      );
       planet.loadPlugin(
         planetaryjs.plugins.earth({
           topojson: { file: "/static_media/world-110m.json" },
@@ -91,7 +100,6 @@ class App extends Component {
         })
       );
     }
-
 
     planet.projection.scale(175).translate([175, 175]).rotate([0, -10, 0]);
 
@@ -163,12 +171,13 @@ class App extends Component {
   }
   render() {
     const { data } = this.state;
-    const total = data.total_distance_m;
-    const toGo = data.earth_circumference_m - total;
+    const total = data.total_distance_m / 1000;
+    const toGo = data.earth_circumference_m / 1000 - total;
 
     return (
       <div className={styles.App}>
-        {/* <h1>In 80 dagen om de wereld</h1> */}
+        <h1>Nelen & Schuurmans</h1>
+        <h2>In 80 dagen om de wereld</h2>
 
         {data.length === 0 ? <MDSpinner /> : null}
 
@@ -186,6 +195,34 @@ class App extends Component {
               <h3>Totaal afgelegd: {Math.round(total)} km</h3>
               <h4>(Nog {Math.round(toGo)} kilometer te gaan)</h4>
             </div>}
+
+        {data.edit_url
+          ? <a href={data.edit_url} className={styles.AddButton}>Toevoegen</a>
+          : <a href="/accounts/login/" className={styles.AddButton}>
+              Inloggen
+            </a>}
+
+        <Scrollbars style={{ width: 600, height: 600 }}>
+          {data.movements_latest.map((entry, i) => {
+            const name = entry.person.split("@")[0];
+            const distanceInKm = entry.distance / 1000;
+            const since = moment(entry.date, "YYYY-MM-DD").locale("nl");
+            return (
+              <div key={i}>
+                <h1>
+                  {name}
+                  {" "}
+                  <span style={{ color: "#838383" }}>
+                    /{entry.mode.toLowerCase()}
+                  </span>
+                </h1>
+                <h2
+                >{`...legde ${since.fromNow()} ${distanceInKm} kilometer af...`}</h2>
+              </div>
+            );
+          })}
+        </Scrollbars>
+
       </div>
     );
   }
