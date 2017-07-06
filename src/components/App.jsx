@@ -196,11 +196,9 @@ class App extends Component {
               <h4>(Nog {Math.round(toGo)} kilometer te gaan)</h4>
             </div>}
 
-        {data.edit_url
-          ? <a href={data.edit_url} className={styles.AddButton}>Toevoegen</a>
-          : <a href="/accounts/login/" className={styles.AddButton}>
-              Inloggen
-            </a>}
+        <a href="/booking/" className={styles.AddButton}>
+          Afstand loggen
+        </a>
 
         <Scrollbars style={{ width: 600, height: 600 }}>
           {data.movements_latest.map((entry, i) => {
