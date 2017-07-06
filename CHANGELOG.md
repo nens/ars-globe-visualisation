@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.1.1"></a>
+## [0.1.1](https://github.com/nens/ars-globe-visualisation/compare/v0.1.0...v0.1.1) (2017-07-06)
+
+
+### Bug Fixes
+
+* **App.jsx:** Adds localhost check for loading geojson. ([d4b35ce](https://github.com/nens/ars-globe-visualisation/commit/d4b35ce))
+* **index.html:** scripts/ --> dist/. ([4ec1162](https://github.com/nens/ars-globe-visualisation/commit/4ec1162))
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/nens/ars-globe-visualisation/compare/v0.0.15...v0.1.0) (2017-07-06)
 
