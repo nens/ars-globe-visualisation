@@ -71,7 +71,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nens/tachtigdagen.git"
+    "url": "https://github.com/nens/ars-globe-visualisation.git"
   },
   "keywords": [
     "lizard",
@@ -81,9 +81,9 @@
   "author": "Gijs Nijholt",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nens/tachtigdagen/issues"
+    "url": "https://github.com/nens/ars-globe-visualisation/issues"
   },
-  "homepage": "https://nens.github.io/tachtigdagen/",
+  "homepage": "https://nens.github.io/ars-globe-visualisation/",
   "dependencies": {
     "@turf/helpers": "^4.3.0",
     "deck.gl": "^4.1.0-alpha.7",
