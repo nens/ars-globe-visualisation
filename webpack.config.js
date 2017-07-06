@@ -1,7 +1,7 @@
 const path = require("path");
 var webpack = require("webpack");
 
-var libraryName = "Lizard";
+var libraryName = "ars-globe";
 
 var config = {
   context: path.join(__dirname, "src"),
@@ -14,7 +14,7 @@ var config = {
   output: {
     path: __dirname + "/lib",
     filename: libraryName + ".js",
-    publicPath: "/scripts/",
+    publicPath: "/dist/",
     library: libraryName,
     libraryTarget: "umd",
     umdNamedDefine: true
