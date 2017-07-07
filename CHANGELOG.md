@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.4"></a>
+## [0.2.4](https://github.com/nens/ars-globe-visualisation/compare/v0.2.3...v0.2.4) (2017-07-07)
+
+
+### Bug Fixes
+
+* **ARS:** Use _km instead of _m/1000. ([be63b0a](https://github.com/nens/ars-globe-visualisation/commit/be63b0a))
+* **git:** rm dist ([cfaf954](https://github.com/nens/ars-globe-visualisation/commit/cfaf954))
+* **git:** update ignore ([644d941](https://github.com/nens/ars-globe-visualisation/commit/644d941))
+
+
+
 <a name="0.2.3"></a>
 ## [0.2.3](https://github.com/nens/ars-globe-visualisation/compare/v0.2.2...v0.2.3) (2017-07-06)
 
