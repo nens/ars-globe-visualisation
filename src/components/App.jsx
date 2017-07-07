@@ -55,7 +55,8 @@ class App extends Component {
         movements_latest: [],
         movements_user: [],
         person: null,
-        total_distance_m: null
+        total_distance_m: null,
+        total_distance_km: null
       }
     };
     this.initTableTop = this.initTableTop.bind(this);
@@ -73,7 +74,7 @@ class App extends Component {
 
   drawPlanet() {
     const { data } = this.state;
-    const total = data.total_distance_m / 1000;
+    const total = data.total_distance_km;
 
     planet.loadPlugin(autorotate(10));
 
@@ -171,7 +172,7 @@ class App extends Component {
   }
   render() {
     const { data } = this.state;
-    const total = data.total_distance_m / 1000;
+    const total = data.total_distance_km;
     const toGo = data.earth_circumference_m / 1000 - total;
 
     return (
