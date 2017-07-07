@@ -177,7 +177,7 @@ class App extends Component {
 
     return (
       <div className={styles.App}>
-        <h3>Reis om de wereld in 80 dagen</h3>
+        <h2>Reis om de wereld in 80 dagen</h2>
         <a href="/booking/" className={styles.AddButton}>
           Afstand loggen
         </a>
@@ -197,27 +197,6 @@ class App extends Component {
               <h3>Totaal afgelegd: {Math.round(total)} km</h3>
               <h4>(Nog {Math.round(toGo)} kilometer te gaan)</h4>
             </div>}
-
-        <Scrollbars style={{ width: 600, height: 600 }}>
-          {data.movements_latest.map((entry, i) => {
-            const name = entry.person.split("@")[0];
-            const distanceInKm = entry.distance / 1000;
-            const since = moment(entry.date, "YYYY-MM-DD").locale("nl");
-            return (
-              <div key={i}>
-                <h1>
-                  {name}
-                  {" "}
-                  <span style={{ color: "#838383" }}>
-                    /{entry.mode.toLowerCase()}
-                  </span>
-                </h1>
-                <h2
-                >{`...legde ${since.fromNow()} ${distanceInKm} kilometer af...`}</h2>
-              </div>
-            );
-          })}
-        </Scrollbars>
 
       </div>
     );
