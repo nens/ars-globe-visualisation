@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.5"></a>
+## [0.2.5](https://github.com/nens/ars-globe-visualisation/compare/v0.2.4...v0.2.5) (2017-07-07)
+
+
+### Bug Fixes
+
+* **ARS:** Removed list. ([0384215](https://github.com/nens/ars-globe-visualisation/commit/0384215))
+
+
+
 <a name="0.2.4"></a>
 ## [0.2.4](https://github.com/nens/ars-globe-visualisation/compare/v0.2.3...v0.2.4) (2017-07-07)
 
