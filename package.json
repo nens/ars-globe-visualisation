@@ -109,6 +109,7 @@
     "react-map-gl": "^2.0.3",
     "react-md-spinner": "^0.2.4",
     "react-redux": "",
+    "react-rotating-text": "^1.2.0",
     "react-router": "",
     "react-router-dom": "",
     "react-tap-event-plugin": "^2.0.1",

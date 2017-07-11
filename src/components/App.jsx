@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
 import { Scrollbars } from "react-custom-scrollbars";
+import ReactRotatingText from "react-rotating-text";
 import styles from "./styles/App.css";
 import Ruler from "./svg/Ruler.svg";
 import moment from "moment";
@@ -183,6 +184,22 @@ class App extends Component {
         </a>
         {data.length === 0 ? <MDSpinner /> : null}
 
+        {data.length === 0
+          ? null
+          : <div
+              style={{
+                lineHeight: "35px"
+              }}
+            >
+              <ReactRotatingText
+                items={[
+                  "Totaal: " + Math.round(total) + " km afgelegd",
+                  "Nog: " + Math.round(toGo) + " kilometer te gaan",
+                  "Aankomst: " + moment("20170928", "YYYYMMDD").locale("nl").fromNow()
+                ]}
+              />
+            </div>}
+
         <canvas
           ref="globe"
           id="globe"
@@ -190,13 +207,6 @@ class App extends Component {
           width="500"
           height="500"
         />
-
-        {data.length === 0
-          ? null
-          : <div style={{ textAlign: "center" }}>
-              <h3>Totaal afgelegd: {Math.round(total)} km</h3>
-              <h4>(Nog {Math.round(toGo)} kilometer te gaan)</h4>
-            </div>}
 
       </div>
     );
