@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/nens/ars-globe-visualisation/compare/v0.2.7...v0.3.0) (2017-07-11)
+
+
+### Features
+
+* **ARS:** Adds time to go. ([f8b36fe](https://github.com/nens/ars-globe-visualisation/commit/f8b36fe))
+
+
+
 <a name="0.2.7"></a>
 ## [0.2.7](https://github.com/nens/ars-globe-visualisation/compare/v0.2.6...v0.2.7) (2017-07-07)
 
