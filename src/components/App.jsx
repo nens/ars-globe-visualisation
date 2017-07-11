@@ -179,6 +179,9 @@ class App extends Component {
     const total = data.total_distance_km;
     const toGo = data.earth_circumference_m / 1000 - total;
 
+    console.log('total', total);
+
+
     return (
       <div className={styles.App}>
         <h2>Reis om de wereld in 80 dagen</h2>
@@ -187,7 +190,7 @@ class App extends Component {
         </a>
         {data.length === 0 ? <MDSpinner /> : null}
 
-        {data.length === 0
+        {(total === null)
           ? null
           : <div
               style={{
