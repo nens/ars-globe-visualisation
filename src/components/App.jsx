@@ -11,6 +11,9 @@ import { distanceToDegrees, distanceToRadians } from "@turf/helpers";
 const DEGREE_LAT_IN_KM = 111.2;
 const TOTAL_EARTH_DISTANCE_KM = 40075;
 
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
+
 const planet = planetaryjs.planet();
 
 function autorotate(degPerSec) {
