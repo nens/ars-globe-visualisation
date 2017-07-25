@@ -61,6 +61,7 @@
     "prettier": "",
     "react-hot-loader": "next",
     "redux-mock-store": "",
+    "script-loader": "^0.7.0",
     "style-loader": "",
     "url-loader": "^0.5.8",
     "webpack": "",
@@ -87,6 +88,7 @@
   "homepage": "https://nens.github.io/ars-globe-visualisation/",
   "dependencies": {
     "@turf/helpers": "^4.3.0",
+    "cesium": "^1.35.2",
     "deck.gl": "^4.1.0-alpha.7",
     "es6-promise": "^4.1.1",
     "i18next": "^8.1.0",

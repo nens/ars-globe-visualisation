@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
-import { Scrollbars } from "react-custom-scrollbars";
 import ReactRotatingText from "react-rotating-text";
 import styles from "./styles/App.css";
-import Ruler from "./svg/Ruler.svg";
 import moment from "moment";
 import MDSpinner from "react-md-spinner";
 import { distanceToDegrees, distanceToRadians } from "@turf/helpers";
@@ -14,37 +12,9 @@ const TOTAL_EARTH_DISTANCE_KM = 40075;
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
-const planet = planetaryjs.planet();
-
-function autorotate(degPerSec) {
-  return function(planet) {
-    let lastTick = null;
-    let paused = false;
-    planet.plugins.autorotate = {
-      pause: function() {
-        paused = true;
-      },
-      resume: function() {
-        paused = false;
-      }
-    };
-    planet.onDraw(function() {
-      if (paused || !lastTick) {
-        lastTick = new Date();
-      } else {
-        let now = new Date();
-        let delta = now - lastTick;
-        // This plugin uses the built-in projection (provided by D3)
-        // to rotate the globe each time we draw it.
-        let rotation = planet.projection.rotate();
-        rotation[0] -= degPerSec * delta / 1000;
-        if (rotation[0] >= 180) rotation[0] -= 360;
-        planet.projection.rotate(rotation);
-        lastTick = now;
-      }
-    });
-  };
-}
+let viewer;
+const step = 40075 / 4;
+const arcs = [[0, 0], [90, step], [180, 2 * step], [270, 3 * step]];
 
 class App extends Component {
   constructor() {
@@ -64,9 +34,9 @@ class App extends Component {
       }
     };
     this.initTableTop = this.initTableTop.bind(this);
-    this.drawPlanet = this.drawPlanet.bind(this);
   }
   componentDidMount() {
+
     window.addEventListener("resize", () => {
       this.setState({
         viewportWidth: window.innerWidth,
@@ -74,92 +44,43 @@ class App extends Component {
       });
     });
     window.addEventListener("DOMContentLoaded", this.initTableTop);
-  }
 
-  drawPlanet() {
-    const { data } = this.state;
-    const total = data.total_distance_km;
-
-    planet.loadPlugin(autorotate(10));
-
-    if (document.location.href.indexOf("localhost:3000") > 0) {
-      console.log("On localhost:3000, get world-110m.json from /");
-      planet.loadPlugin(
-        planetaryjs.plugins.earth({
-          topojson: { file: "world-110m.json" },
-          oceans: { fill: "#001320" },
-          land: { fill: "#06304e" },
-          borders: { stroke: "#001320" }
-        })
-      );
-    } else {
-      console.log(
-        "Not on localhost:3000, getting world-110m.json from /static_media/"
-      );
-      planet.loadPlugin(
-        planetaryjs.plugins.earth({
-          topojson: { file: "/static_media/world-110m.json" },
-          oceans: { fill: "#001320" },
-          land: { fill: "#06304e" },
-          borders: { stroke: "#001320" }
-        })
-      );
-    }
-
-    planet.projection.scale(175).translate([175, 175]).rotate([0, -10, 0]);
-
-    planet.loadPlugin(
-      planetaryjs.plugins.drag({
-        onDragStart: function() {
-          this.plugins.autorotate.pause();
-        },
-        onDragEnd: function() {
-          this.plugins.autorotate.resume();
-        }
-      })
-    );
-
-    planet.loadPlugin(function(planet) {
-      planet.onDraw(function() {
-        planet.withSavedContext(function(context) {
-          function drawArc(fromDegrees, toDegrees) {
-            if (fromDegrees >= 180) fromDegrees -= 360;
-            if (toDegrees >= 180) toDegrees -= 360;
-
-            var arc = {
-              type: "LineString",
-              coordinates: [[fromDegrees, 0], [toDegrees, 0]]
-            };
-            context.beginPath();
-            planet.path.context(context)(arc);
-            context.strokeStyle = "#ffffff";
-            context.lineWidth = 5;
-            context.stroke();
-            context.closePath();
-          }
-
-          // Divide arc into four so they don't wrap around the world the wrong way
-          var step = 40075 / 4;
-          var arcs = [[0, 0], [90, step], [180, 2 * step], [270, 3 * step]];
-
-          arcs.forEach((element, i) => {
-            let degrees = element[0];
-            let start = element[1];
-
-            // Dist is between 0 and 1, part of this arc to draw
-            let dist = (total - start) / step;
-            if (dist <= 0) return;
-            if (dist > 1) dist = 1;
-
-            drawArc(degrees, degrees + dist * 90);
-          });
-        });
-      });
+    const mapbox = new Cesium.MapboxImageryProvider({
+        mapId: 'mapbox.satellite',
+        accessToken: 'pk.eyJ1IjoibmVsZW5zY2h1dXJtYW5zIiwiYSI6ImhkXzhTdXcifQ.3k2-KAxQdyl5bILh_FioCw'
     });
 
-    planet.projection.scale(250).translate([250, 250]);
-    let canvas = document.getElementById("globe");
-    planet.draw(canvas);
+
+    const center = Cesium.Cartesian3.fromDegrees(0, 0, 6000000);
+    viewer = new Cesium.Viewer("cesiumContainer", {
+      imageryProvider: mapbox,
+      timeline: false,
+      infobox: false,
+      baseLayerPicker : false,
+    });
+    viewer.camera.setView({
+        destination : center
+    });
+
+
+    viewer.entities.add({
+        position : Cesium.Cartesian3.fromDegrees(0,1),
+        label : {
+            text : 'Start/finish',
+            font : '24px Helvetica',
+            fillColor : Cesium.Color.SKYBLUE,
+            outlineColor : Cesium.Color.BLACK,
+            outlineWidth : 2,
+            style : Cesium.LabelStyle.FILL_AND_OUTLINE
+        }
+    });
+
+
+    // Hide clock widget
+    document.getElementsByClassName('cesium-viewer-animationContainer')[0].style.visibility = "hidden";
+    document.getElementsByClassName('cesium-viewer-toolbar')[0].style.visibility = "hidden";
+    viewer.forceResize();
+
   }
 
   initTableTop() {
@@ -167,9 +88,115 @@ class App extends Component {
       this.setState(
         {
           data: data
-        },
-        () => {
-          this.drawPlanet();
+        }, () => {
+          function drawArc(fromDegrees, toDegrees) {
+            if (fromDegrees >= 180) fromDegrees -= 360;
+            if (toDegrees >= 180) toDegrees -= 360;
+
+            var arc = {
+              'polyline': {
+                'positions': Cesium.Cartesian3.fromDegreesArray([fromDegrees, 0, toDegrees, 0]),
+                'width': 5,
+                'material': Cesium.Color.WHITE
+              }
+            };
+            viewer.entities.add(arc);
+          }
+
+          arcs.forEach((element, i) => {
+            let degrees = element[0];
+            let start = element[1];
+
+            // Dist is between 0 and 1, part of this arc to draw
+            let dist = (this.state.data.total_distance_km - start) / step;
+            if (dist <= 0) return;
+            if (dist > 1) dist = 1;
+
+            drawArc(degrees, degrees + dist * 90);
+          });
+
+
+          function fromToAnimation(adjustPitch) {
+              var camera = viewer.scene.camera;
+
+              var fromOptions = {
+                  destination : Cesium.Cartesian3.fromDegrees(0, 0, 2000000.0),
+                  duration: 5,
+                  orientation: {
+                      heading : Cesium.Math.toRadians(0.0),
+                      pitch : Cesium.Math.toRadians(-90),
+                      roll : 0.0
+                  }
+              };
+
+
+              var toOptions = {
+                  destination : Cesium.Cartesian3.fromDegrees(185, 0, 1500000.0),
+                  orientation: {
+                      // heading : Cesium.Math.toRadians(45.0),
+                      // pitch : Cesium.Math.toRadians(-70),
+                      roll : 0.0
+                  },
+                  duration: 7
+                  // flyOverLongitude: Cesium.Math.toRadians(200000.0)
+              };
+
+              fromOptions.complete = function() {
+                  setTimeout(function() {
+                      camera.flyTo(toOptions);
+                  }, 1000);
+              };
+
+              if (adjustPitch) {
+                  toOptions.pitchAdjustHeight = 1000;
+                  fromOptions.pitchAdjustHeight = 1000;
+              }
+
+              camera.flyTo(fromOptions);
+          }
+
+          // setTimeout(function() {
+          //   fromToAnimation();
+          // }, 2000);
+
+          // function icrf(scene, time) {
+          //     if (scene.mode !== Cesium.SceneMode.SCENE3D) {
+          //         return;
+          //     }
+          //     var icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(time);
+          //     if (Cesium.defined(icrfToFixed)) {
+          //         var camera = viewer.camera;
+          //         var offset = Cesium.Cartesian3.clone(camera.position);
+          //         var transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
+          //         camera.lookAtTransform(transform, offset);
+          //     }
+          // }
+          //
+          //
+          // const clock = viewer.clock;
+          // const scene = viewer.scene;
+          // setTimeout(function() {
+          //   clock.multiplier = 3 * 60 * 10 * -1;
+          //   scene.preRender.addEventListener(icrf);
+          // }, 2000);
+
+
+
+
+          function spinGlobe( dynamicRate ){
+              var previousTime = Date.now();
+
+              viewer.scene.postRender.addEventListener(function (scene, time){
+                  var spinRate = dynamicRate;
+                  var currentTime = Date.now();
+                  var delta = ( currentTime - previousTime ) / 1000;
+                  previousTime = currentTime;
+                  viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -spinRate * delta);
+              });
+          }
+
+          spinGlobe(0.02);
+
         }
       );
     });
@@ -179,41 +206,34 @@ class App extends Component {
     const total = data.total_distance_km;
     const toGo = data.earth_circumference_m / 1000 - total;
 
-    console.log('total', total);
-
-
     return (
       <div className={styles.App}>
-        <h2>Reis om de wereld in 80 dagen</h2>
-        <a href="/booking/" className={styles.AddButton}>
-          Afstand loggen
-        </a>
-        {data.length === 0 ? <MDSpinner /> : null}
+        <div id="title" style={{ position: 'absolute', zIndex: 9999, top: 200 }}>
 
-        {(total === null)
-          ? null
-          : <div
-              style={{
-                lineHeight: "35px"
-              }}
-            >
-              <ReactRotatingText
-                items={[
-                  "Totaal: " + Math.round(total) + " km afgelegd",
-                  "Nog: " + Math.round(toGo) + " kilometer te gaan",
-                  "Aankomst: " + moment("20170928", "YYYYMMDD").locale("nl").fromNow()
-                ]}
-              />
-            </div>}
+          <h2>Reis om de wereld in 80 dagen</h2>
+          <a href="/booking/" className={styles.AddButton}>
+            Afstand loggen
+          </a><br/>
+          {data.length === 0 ? <MDSpinner /> : null}
 
-        <canvas
-          ref="globe"
-          id="globe"
-          className={styles.Globe}
-          width="500"
-          height="500"
-        />
-
+          {(total === null)
+            ? null
+            : <div
+                style={{
+                  lineHeight: "35px",
+                  paddingTop: 20
+                }}
+              >
+                <ReactRotatingText
+                  items={[
+                    "Totaal: " + Math.round(total) + " km afgelegd",
+                    "Nog: " + Math.round(toGo) + " kilometer te gaan",
+                    "Aankomst: " + moment("20170928", "YYYYMMDD").locale("nl").fromNow()
+                  ]}
+                />
+              </div>}
+        </div>
+        <div id="cesiumContainer" ref="cesiumRoot"></div>
       </div>
     );
   }

@@ -29,7 +29,8 @@ app.use((req, res, next) => {
 
 
 app.use("/api", (req, res) => {
-  const url = "http://localhost:5000/api" + req.url;
+  // const url = "http://localhost:5000/api" + req.url;
+  const url = "https://reisomdewereldin80dagen.nelen-schuurmans.nl/api" + req.url;
   const headers = {
     username: process.env.sso_user,
     password: process.env.sso_pass
