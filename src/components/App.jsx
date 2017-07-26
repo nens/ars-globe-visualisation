@@ -224,9 +224,8 @@ class App extends Component {
       <div className={styles.App}>
         <div
           id="title"
-          style={{ position: "absolute", zIndex: 9999, top: 200 }}
+          style={{ position: "absolute", zIndex: 9999, top: 0, left: 0, paddingLeft: 20 }}
         >
-
           <h2>Reis om de wereld in 80 dagen</h2>
           <a href="/booking/" className={styles.AddButton}>
             Afstand loggen
