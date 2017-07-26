@@ -9,8 +9,8 @@ import { distanceToDegrees, distanceToRadians } from "@turf/helpers";
 const DEGREE_LAT_IN_KM = 111.2;
 const TOTAL_EARTH_DISTANCE_KM = 40075;
 
-require('es6-promise').polyfill();
-require('isomorphic-fetch');
+require("es6-promise").polyfill();
+require("isomorphic-fetch");
 
 let viewer;
 const step = 40075 / 4;
@@ -36,7 +36,6 @@ class App extends Component {
     this.initTableTop = this.initTableTop.bind(this);
   }
   componentDidMount() {
-
     window.addEventListener("resize", () => {
       this.setState({
         viewportWidth: window.innerWidth,
@@ -46,41 +45,53 @@ class App extends Component {
     window.addEventListener("DOMContentLoaded", this.initTableTop);
 
     const mapbox = new Cesium.MapboxImageryProvider({
-        mapId: 'mapbox.satellite',
-        accessToken: 'pk.eyJ1IjoibmVsZW5zY2h1dXJtYW5zIiwiYSI6ImhkXzhTdXcifQ.3k2-KAxQdyl5bILh_FioCw'
+      mapId: "mapbox.satellite",
+      accessToken: "pk.eyJ1IjoibmVsZW5zY2h1dXJtYW5zIiwiYSI6ImhkXzhTdXcifQ.3k2-KAxQdyl5bILh_FioCw"
     });
-
 
     const center = Cesium.Cartesian3.fromDegrees(0, 0, 6000000);
     viewer = new Cesium.Viewer("cesiumContainer", {
       imageryProvider: mapbox,
       timeline: false,
       infobox: false,
-      baseLayerPicker : false,
+      baseLayerPicker: false
     });
     viewer.camera.setView({
-        destination : center
+      destination: center
     });
 
+    const terrainProvider = new Cesium.CesiumTerrainProvider({
+      url: "https://assets.agi.com/stk-terrain/v1/tilesets/world/tiles",
+      requestWaterMask: true,
+      requestVertexNormals: true
+    });
+    viewer.terrainProvider = terrainProvider;
+    viewer.scene.globe.enableLighting = true;
 
     viewer.entities.add({
-        position : Cesium.Cartesian3.fromDegrees(0,1),
-        label : {
-            text : 'Start/finish',
-            font : '24px Helvetica',
-            fillColor : Cesium.Color.SKYBLUE,
-            outlineColor : Cesium.Color.BLACK,
-            outlineWidth : 2,
-            style : Cesium.LabelStyle.FILL_AND_OUTLINE
-        }
+      position: Cesium.Cartesian3.fromDegrees(0, 0),
+      label: {
+        text: "Start/finish",
+        font: "24px Helvetica",
+        fillColor: Cesium.Color.SKYBLUE,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      }
     });
 
-
     // Hide clock widget
-    document.getElementsByClassName('cesium-viewer-animationContainer')[0].style.visibility = "hidden";
-    document.getElementsByClassName('cesium-viewer-toolbar')[0].style.visibility = "hidden";
+    document.getElementsByClassName(
+      "cesium-viewer-animationContainer"
+    )[0].style.visibility =
+      "hidden";
+    document.getElementsByClassName(
+      "cesium-viewer-toolbar"
+    )[0].style.visibility =
+      "hidden";
     viewer.forceResize();
-
   }
 
   initTableTop() {
@@ -88,16 +99,22 @@ class App extends Component {
       this.setState(
         {
           data: data
-        }, () => {
+        },
+        () => {
           function drawArc(fromDegrees, toDegrees) {
             if (fromDegrees >= 180) fromDegrees -= 360;
             if (toDegrees >= 180) toDegrees -= 360;
 
             var arc = {
-              'polyline': {
-                'positions': Cesium.Cartesian3.fromDegreesArray([fromDegrees, 0, toDegrees, 0]),
-                'width': 5,
-                'material': Cesium.Color.WHITE
+              polyline: {
+                positions: Cesium.Cartesian3.fromDegreesArray([
+                  fromDegrees,
+                  0,
+                  toDegrees,
+                  0
+                ]),
+                width: 5,
+                material: Cesium.Color.WHITE
               }
             };
             viewer.entities.add(arc);
@@ -115,44 +132,42 @@ class App extends Component {
             drawArc(degrees, degrees + dist * 90);
           });
 
-
           function fromToAnimation(adjustPitch) {
-              var camera = viewer.scene.camera;
+            var camera = viewer.scene.camera;
 
-              var fromOptions = {
-                  destination : Cesium.Cartesian3.fromDegrees(0, 0, 2000000.0),
-                  duration: 5,
-                  orientation: {
-                      heading : Cesium.Math.toRadians(0.0),
-                      pitch : Cesium.Math.toRadians(-90),
-                      roll : 0.0
-                  }
-              };
-
-
-              var toOptions = {
-                  destination : Cesium.Cartesian3.fromDegrees(185, 0, 1500000.0),
-                  orientation: {
-                      // heading : Cesium.Math.toRadians(45.0),
-                      // pitch : Cesium.Math.toRadians(-70),
-                      roll : 0.0
-                  },
-                  duration: 7
-                  // flyOverLongitude: Cesium.Math.toRadians(200000.0)
-              };
-
-              fromOptions.complete = function() {
-                  setTimeout(function() {
-                      camera.flyTo(toOptions);
-                  }, 1000);
-              };
-
-              if (adjustPitch) {
-                  toOptions.pitchAdjustHeight = 1000;
-                  fromOptions.pitchAdjustHeight = 1000;
+            var fromOptions = {
+              destination: Cesium.Cartesian3.fromDegrees(0, 0, 2000000.0),
+              duration: 5,
+              orientation: {
+                heading: Cesium.Math.toRadians(0.0),
+                pitch: Cesium.Math.toRadians(-90),
+                roll: 0.0
               }
+            };
 
-              camera.flyTo(fromOptions);
+            var toOptions = {
+              destination: Cesium.Cartesian3.fromDegrees(185, 0, 1500000.0),
+              orientation: {
+                // heading : Cesium.Math.toRadians(45.0),
+                // pitch : Cesium.Math.toRadians(-70),
+                roll: 0.0
+              },
+              duration: 7
+              // flyOverLongitude: Cesium.Math.toRadians(200000.0)
+            };
+
+            fromOptions.complete = function() {
+              setTimeout(function() {
+                camera.flyTo(toOptions);
+              }, 1000);
+            };
+
+            if (adjustPitch) {
+              toOptions.pitchAdjustHeight = 1000;
+              fromOptions.pitchAdjustHeight = 1000;
+            }
+
+            camera.flyTo(fromOptions);
           }
 
           // setTimeout(function() {
@@ -180,23 +195,22 @@ class App extends Component {
           //   scene.preRender.addEventListener(icrf);
           // }, 2000);
 
+          function spinGlobe(dynamicRate) {
+            var previousTime = Date.now();
 
-
-
-          function spinGlobe( dynamicRate ){
-              var previousTime = Date.now();
-
-              viewer.scene.postRender.addEventListener(function (scene, time){
-                  var spinRate = dynamicRate;
-                  var currentTime = Date.now();
-                  var delta = ( currentTime - previousTime ) / 1000;
-                  previousTime = currentTime;
-                  viewer.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -spinRate * delta);
-              });
+            viewer.scene.postRender.addEventListener(function(scene, time) {
+              var spinRate = dynamicRate;
+              var currentTime = Date.now();
+              var delta = (currentTime - previousTime) / 1000;
+              previousTime = currentTime;
+              viewer.scene.camera.rotate(
+                Cesium.Cartesian3.UNIT_Z,
+                -spinRate * delta
+              );
+            });
           }
 
-          spinGlobe(0.02);
-
+          spinGlobe(0.0008);
         }
       );
     });
@@ -208,15 +222,18 @@ class App extends Component {
 
     return (
       <div className={styles.App}>
-        <div id="title" style={{ position: 'absolute', zIndex: 9999, top: 200 }}>
+        <div
+          id="title"
+          style={{ position: "absolute", zIndex: 9999, top: 200 }}
+        >
 
           <h2>Reis om de wereld in 80 dagen</h2>
           <a href="/booking/" className={styles.AddButton}>
             Afstand loggen
-          </a><br/>
+          </a><br />
           {data.length === 0 ? <MDSpinner /> : null}
 
-          {(total === null)
+          {total === null
             ? null
             : <div
                 style={{
@@ -228,12 +245,13 @@ class App extends Component {
                   items={[
                     "Totaal: " + Math.round(total) + " km afgelegd",
                     "Nog: " + Math.round(toGo) + " kilometer te gaan",
-                    "Aankomst: " + moment("20170928", "YYYYMMDD").locale("nl").fromNow()
+                    "Aankomst: " +
+                      moment("20170928", "YYYYMMDD").locale("nl").fromNow()
                   ]}
                 />
               </div>}
         </div>
-        <div id="cesiumContainer" ref="cesiumRoot"></div>
+        <div id="cesiumContainer" ref="cesiumRoot" />
       </div>
     );
   }
