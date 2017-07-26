@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.2"></a>
+## [0.4.2](https://github.com/nens/ars-globe-visualisation/compare/v0.4.1...v0.4.2) (2017-07-26)
+
+
+### Bug Fixes
+
+* **title:** Position fixed ([fc8949f](https://github.com/nens/ars-globe-visualisation/commit/fc8949f))
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/nens/ars-globe-visualisation/compare/v0.4.0...v0.4.1) (2017-07-26)
 
