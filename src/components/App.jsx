@@ -49,7 +49,7 @@ class App extends Component {
       accessToken: "pk.eyJ1IjoibmVsZW5zY2h1dXJtYW5zIiwiYSI6ImhkXzhTdXcifQ.3k2-KAxQdyl5bILh_FioCw"
     });
 
-    const center = Cesium.Cartesian3.fromDegrees(0, 0, 6000000);
+    // const center = Cesium.Cartesian3.fromDegrees(0, 0, 6000000);
     viewer = new Cesium.Viewer("cesiumContainer", {
       imageryProvider: mapbox,
       timeline: false,
@@ -57,7 +57,7 @@ class App extends Component {
       baseLayerPicker: false
     });
     viewer.camera.setView({
-      destination: center
+      destination: Cesium.Cartesian3.fromDegrees(20, 0, 15000000)
     });
 
     const terrainProvider = new Cesium.CesiumTerrainProvider({
@@ -81,6 +81,106 @@ class App extends Component {
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
       }
     });
+
+
+    var scene = viewer.scene;
+
+    var pathPosition = new Cesium.SampledPositionProperty();
+    // var entityPath = viewer.entities.add({
+    //     position : pathPosition,
+    //     name : 'path',
+    //     path : {
+    //         show : true,
+    //         leadTime : 0,
+    //         trailTime : 60,
+    //         width : 10,
+    //         resolution : 1,
+    //         material : new Cesium.PolylineGlowMaterialProperty({
+    //             glowPower : 0.3,
+    //             color : Cesium.Color.PALEGOLDENROD
+    //         })
+    //     }
+    // });
+
+    var camera = viewer.camera;
+    // var controller = scene.screenSpaceCameraController;
+    var r = 0;
+    var center = new Cesium.Cartesian3();
+
+    var hpRoll = new Cesium.HeadingPitchRoll();
+    hpRoll.heading = Cesium.Math.toRadians(90.0);
+    var hpRange = new Cesium.HeadingPitchRange();
+    var speed = 500000;
+    var deltaRadians = Cesium.Math.toRadians(3.0);
+
+    var position = Cesium.Cartesian3.fromDegrees(0, 0, 5000.0);
+    var speedVector = new Cesium.Cartesian3();
+    var fixedFrameTransform = Cesium.Transforms.localFrameToFixedFrameGenerator('north', 'west');
+
+    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
+        Cesium.Cartesian3.fromDegrees(0, 0, 5000.0));
+
+    var planePrimitive = scene.primitives.add(Cesium.Model.fromGltf({
+        url : '/static_media/Cesium_Air.glb',
+        modelMatrix : Cesium.Transforms.headingPitchRollToFixedFrame(position, hpRoll, Cesium.Ellipsoid.WGS84, fixedFrameTransform),
+        // modelMatrix: modelMatrix,
+        minimumPixelSize : 128
+    }));
+
+    planePrimitive.readyPromise.then(function(model) {
+        // Play and loop all animations at half-speed
+        model.activeAnimations.addAll({
+            speedup : 100,
+            loop : Cesium.ModelAnimationLoop.REPEAT
+        });
+
+        // Zoom to model
+        r = 2000.0 * Math.max(model.boundingSphere.radius, camera.frustum.near);
+        controller.minimumZoomDistance = r * 0.5;
+        Cesium.Matrix4.multiplyByPoint(model.modelMatrix, model.boundingSphere.center, center);
+        var heading = Cesium.Math.toRadians(70.0);
+        var pitch = Cesium.Math.toRadians(-20.0);
+        hpRange.heading = heading;
+        hpRange.pitch = pitch;
+        hpRange.range = r * 150.0;
+        camera.lookAt(center, hpRange);
+    });
+
+
+
+
+
+    var previousTime = Date.now();
+    viewer.scene.preRender.addEventListener(function(scene, time) {
+
+        speedVector = Cesium.Cartesian3.multiplyByScalar(Cesium.Cartesian3.UNIT_X, speed / 10, speedVector);
+        position = Cesium.Matrix4.multiplyByPoint(planePrimitive.modelMatrix, speedVector, position);
+        pathPosition.addSample(Cesium.JulianDate.now(), position);
+        Cesium.Transforms.headingPitchRollToFixedFrame(position, hpRoll, Cesium.Ellipsoid.WGS84, fixedFrameTransform, planePrimitive.modelMatrix);
+
+            // Cesium.Matrix4.multiplyByPoint(planePrimitive.modelMatrix, planePrimitive.boundingSphere.center, center);
+            // hpRange.heading = hpRoll.heading;
+            // hpRange.pitch = hpRoll.pitch;
+            // camera.lookAt(center, hpRange);
+
+          // camera.lookAt(Cesium.Cartesian3(position.x, position.y, 0), new Cesium.HeadingPitchRange(hpRange.heading, hpRange.pitch, hpRange.roll));
+          // camera.setView({
+          //   heading: hpRoll.heading,
+          //   pitch: hpRoll.pitch,
+          //   roll: hpRoll.roll
+          // })
+          // camera.lookAt(center, hpRange);
+
+          var spinRate = 0.001;
+          var currentTime = Date.now();
+          var delta = (currentTime - previousTime) / 100;
+          previousTime = currentTime;
+          viewer.scene.camera.rotate(
+            Cesium.Cartesian3.UNIT_Z,
+            -spinRate * delta
+          );
+    });
+
 
     // Hide clock widget
     document.getElementsByClassName(
@@ -201,7 +301,7 @@ class App extends Component {
             viewer.scene.postRender.addEventListener(function(scene, time) {
               var spinRate = dynamicRate;
               var currentTime = Date.now();
-              var delta = (currentTime - previousTime) / 1000;
+              var delta = (currentTime - previousTime) / 100;
               previousTime = currentTime;
               viewer.scene.camera.rotate(
                 Cesium.Cartesian3.UNIT_Z,
@@ -209,8 +309,7 @@ class App extends Component {
               );
             });
           }
-
-          spinGlobe(0.0008);
+          spinGlobe(0.001);
         }
       );
     });
@@ -224,31 +323,22 @@ class App extends Component {
       <div className={styles.App}>
         <div
           id="title"
-          style={{ position: "absolute", zIndex: 9999, top: 0, left: 0, paddingLeft: 20 }}
+          style={{ position: "absolute", zIndex: 9999, top: "10px", left: "10px" }}
         >
-          <h2>Reis om de wereld in 80 dagen</h2>
-          <a href="/booking/" className={styles.AddButton}>
-            Afstand loggen
-          </a><br />
-          {data.length === 0 ? <MDSpinner /> : null}
-
+          <h1>Challenge completed!</h1>
+          <p style={{maxWidth: 400, lineHeight:"25px"}}>Op maandag 25 september 2017 is het Nelen &amp; Schuurmans gelukt om, drie dagen voor de deadline, de hele aardbol te circumnavigeren!</p>
           {total === null
             ? null
             : <div
                 style={{
                   lineHeight: "35px",
-                  paddingTop: 20
                 }}
               >
-                <ReactRotatingText
-                  items={[
-                    "Totaal: " + Math.round(total) + " km afgelegd",
-                    "Nog: " + Math.round(toGo) + " kilometer te gaan",
-                    "Aankomst: " +
-                      moment("20170928", "YYYYMMDD").locale("nl").fromNow()
-                  ]}
-                />
+                <p style={{maxWidth: 400, lineHeight:"25px"}}>{`In totaal hebben we ${Math.round(total)} km afgelegd. Per fiets, te voet, roeiend en zelfs zwemmend.`}</p>
               </div>}
+          {data.length === 0 ? <MDSpinner /> : null}
+          <p style={{maxWidth: 400, fontSize:"2em", lineHeight:"25px"}}>Gefeliciteerd!</p>
+
         </div>
         <div id="cesiumContainer" ref="cesiumRoot" />
       </div>
