@@ -338,6 +338,9 @@ class App extends Component {
               </div>}
           {data.length === 0 ? <MDSpinner /> : null}
           <p style={{maxWidth: 400, fontSize:"2em", lineHeight:"25px"}}>Gefeliciteerd!</p>
+          <a href="/booking/" className={styles.AddButton}>
+            Inloggen
+          </a>
 
         </div>
         <div id="cesiumContainer" ref="cesiumRoot" />
